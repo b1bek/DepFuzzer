@@ -13,6 +13,13 @@ $ source .venv/bin/activate
 $ pip3 install -r requirements.txt
 ```
 
+Or you can use the docker image :
+
+```sh
+$ docker build -t depfuzzer .
+$ docker run --rm -it -v "$PWD":/host --net=host depfuzzer
+```
+
 ## Use the tool
 
 The tool can be used to scan folders to search specific file where dependencies are declared, for example :
