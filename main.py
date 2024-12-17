@@ -1,3 +1,4 @@
+#! /usr/bin/env python3
 """
 Main script to analyze dependencies of a github organization
 """
