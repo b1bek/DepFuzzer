@@ -2,6 +2,7 @@ import re
 import json
 import glob
 import requirements
+import xml.dom.minidom as xml
 from pip._vendor import tomli
 
 class RecoverDependencies:
@@ -161,6 +162,45 @@ class RecoverDependencies:
                             if module_name not in self.dependencies:
                                 self.dependencies[module_name.replace('"',"")] = version
 
+    def get_maven_dependencies(self):
+        """
+        Method used to recover all java maven dependencies from projects
+        """
+        pomxml_files = []
+        for filename in glob.glob(f"{self.path}/**/pom.xml", recursive=True):
+            pomxml_files.append(filename)
+
+        for pomxml_file in pomxml_files:
+            dom = xml.parse(pomxml_file)
+            dependencies = dom.getElementsByTagName('dependency')
+            for dependency in dependencies:
+                group_id = dependency.getElementsByTagName('groupId')[0].childNodes[0].data
+                artifact_id = dependency.getElementsByTagName('artifactId')[0].childNodes[0].data
+                version = dependency.getElementsByTagName('version')[0].childNodes[0].data
+
+                package_name = f'{group_id}:{artifact_id}'
+                self.dependencies[package_name] = version
+
+    def get_gradle_dependencies(self):
+        """
+        Method used to recover all java gradle dependencies from projects
+        """
+
+        buildgradle_files = []
+        for filename in glob.glob(f"{self.path}/**/build.gradle", recursive=True):
+            buildgradle_files.append(filename)
+        
+        for buildgradle_file in buildgradle_files:
+            with open(buildgradle_file, 'r') as file:
+                gradle_content = file.read()
+
+            dependency_pattern = re.compile(r'(\w+)\s\'([\w.-]+):([\w.-]+):([\w.-]+)\'')
+            dependencies = dependency_pattern.findall(gradle_content)
+            for dependency in dependencies:
+                package_name = f'{dependency[1]}:{dependency[2]}'
+                version = dependency[3]
+                self.dependencies[package_name] = version
+
     def run(self):
         """
         Method used to run the right function to recover dependencies
@@ -175,4 +215,8 @@ class RecoverDependencies:
                 self.get_cargo_dependencies()
             case "go":
                 self.get_go_dependencies()
+            case "maven":
+                self.get_maven_dependencies()
+            case "gradle":
+                self.get_gradle_dependencies()
         print(f"[+] Found {len(self.dependencies)} {self.provider} dependencies")
