@@ -2,7 +2,7 @@ import re
 import json
 import glob
 import requirements
-import xml.dom.minidom as xml
+import defusedxml.minidom as xml
 from pip._vendor import tomli
 
 class RecoverDependencies:
