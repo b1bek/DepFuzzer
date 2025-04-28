@@ -48,23 +48,26 @@ ______          ______
           | |                               
           |_|                               
 
-usage: main.py [-h] --provider {npm,pypi,cargo,go,all} (--path PATH | --dependency DEPENDENCY) [--print-takeover PRINT_TAKEOVER] [--output-file OUTPUT_FILE] [--check-email CHECK_EMAIL]
+usage: main.py [-h] --provider {npm,pypi,cargo,go,maven,gradle,all}
+               (--path PATH | --dependency DEPENDENCY) [--print-takeover PRINT_TAKEOVER]
+               [--output-file OUTPUT_FILE] [--check-email CHECK_EMAIL]
 
 Dependency checker
 
 options:
   -h, --help            show this help message and exit
-  --provider {npm,pypi,cargo,go,all}
+  --provider {npm,pypi,cargo,go,maven,gradle,all}
   --path PATH           Path to folder(s) to analyze
   --dependency DEPENDENCY
-                        Specify the name of one dependency to check. 
-                        If you specify the version, please use ':' to separate name and version.
+                        Specify the name of one dependency to check. If you specify the version,
+                        please use ':' to separate name and version.
   --print-takeover PRINT_TAKEOVER
                         Don't wait the end of the script to display takeoverable modules
   --output-file OUTPUT_FILE
                         File where results will be stored
   --check-email CHECK_EMAIL
-                        Check if the email's owner of the dependency exists. Might be longer to analyze.
+                        Check if the email's owner of the dependency exists. Might be longer to
+                        analyze.
 ```
 
 ## Found a bug or an idea ?
