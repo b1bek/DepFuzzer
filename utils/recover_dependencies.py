@@ -201,6 +201,29 @@ class RecoverDependencies:
                 version = dependency[3]
                 self.dependencies[package_name] = version
 
+    def get_gem_dependencies(self):
+        """
+        Method used to recover all ruby gem dependencies from projects
+        """
+
+        gemfile_files = []
+        for filename in glob.glob(f"{self.path}/**/Gemfile", recursive=True):
+            gemfile_files.append(filename)
+
+        for gemfile_file in gemfile_files:
+            with open(gemfile_file, 'r') as file:
+                for line in file.readlines():
+                    if not line.startswith('#') and len(line.strip()) > 0:
+                        if line.startswith('gem'):
+                            parts = line.split(',')
+                            package_name = re.split(r'["\']', parts[0])[1]
+                            try:
+                                version = re.split(r'["\']', parts[1])[1].split(' ')[1].strip()
+                            except:
+                                version = ''
+                            self.dependencies[package_name] = version
+
+
     def run(self):
         """
         Method used to run the right function to recover dependencies
@@ -219,4 +242,6 @@ class RecoverDependencies:
                 self.get_maven_dependencies()
             case "gradle":
                 self.get_gradle_dependencies()
+            case "rubygems":
+                self.get_gem_dependencies()
         print(f"[+] Found {len(self.dependencies)} {self.provider} dependencies")
