@@ -214,7 +214,7 @@ class RecoverDependencies:
             with open(gemfile_file, 'r') as file:
                 for line in file.readlines():
                     if not line.startswith('#') and len(line.strip()) > 0:
-                        if line.startswith('gem'):
+                        if line.startswith('gem '):
                             parts = line.split(',')
                             package_name = re.split(r'["\']', parts[0])[1]
                             try:
