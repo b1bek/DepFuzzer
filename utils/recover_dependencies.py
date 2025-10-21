@@ -30,7 +30,16 @@ class RecoverDependencies:
                 content = json.loads(fd.read())
 
             if content.get("workspaces"):
-                for custom_package in content.get("workspaces")["packages"]:
+                workspaces = content.get("workspaces")
+                # Handle both array format and object format for workspaces
+                if isinstance(workspaces, list):
+                    packages = workspaces
+                elif isinstance(workspaces, dict) and workspaces.get("packages"):
+                    packages = workspaces["packages"]
+                else:
+                    packages = []
+                
+                for custom_package in packages:
                     for filename in glob.glob(f"{self.path}/**/{custom_package}", recursive=True):
                         self.to_exclude.append(filename.split(custom_package.split("/")[0])[1].replace("/",""))
 
@@ -229,19 +238,19 @@ class RecoverDependencies:
         Method used to run the right function to recover dependencies
         """
         print(f"[+] Processing repositories for {self.provider}")
-        match self.provider:
-            case "pypi":
-                self.get_pypi_dependencies()
-            case "npm":
-                self.get_npm_dependencies()
-            case "cargo":
-                self.get_cargo_dependencies()
-            case "go":
-                self.get_go_dependencies()
-            case "maven":
-                self.get_maven_dependencies()
-            case "gradle":
-                self.get_gradle_dependencies()
-            case "rubygems":
-                self.get_gem_dependencies()
+        if self.provider == "pypi":
+            self.get_pypi_dependencies()
+        elif self.provider == "npm":
+            self.get_npm_dependencies()
+        elif self.provider == "cargo":
+            self.get_cargo_dependencies()
+        elif self.provider == "go":
+            self.get_go_dependencies()
+        elif self.provider == "maven":
+            self.get_maven_dependencies()
+        elif self.provider == "gradle":
+            self.get_gradle_dependencies()
+        elif self.provider == "rubygems":
+            self.get_gem_dependencies()
         print(f"[+] Found {len(self.dependencies)} {self.provider} dependencies")
+

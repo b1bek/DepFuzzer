@@ -29,20 +29,19 @@ class EmailChecker:
                 res = requests.get(self.email_urls[self.provider]%(self.package), timeout=10)
                 if res.status_code == 200:
                     data = res.json()
-                    match self.provider:
-                        case "pypi":
-                            return [data.get("info").get("author_email")]
-                        case "npm":
-                            emails = []
-                            if data.get("maintainers") is not None:
-                                for maintainer in data.get("maintainers"):
-                                    if maintainer.get("email"):
-                                        emails.append(maintainer["email"])
-                            if data.get("contributors") is not None:
-                                for contributor in data.get("contributors"):
-                                    if contributor.get("email"):
-                                        emails.append(contributor["email"])
-                            return emails
+                    if self.provider == "pypi":
+                        return [data.get("info").get("author_email")]
+                    elif self.provider == "npm":
+                        emails = []
+                        if data.get("maintainers") is not None:
+                            for maintainer in data.get("maintainers"):
+                                if maintainer.get("email"):
+                                    emails.append(maintainer["email"])
+                        if data.get("contributors") is not None:
+                            for contributor in data.get("contributors"):
+                                if contributor.get("email"):
+                                    emails.append(contributor["email"])
+                        return emails
             except Exception:
                 return []
         else:
