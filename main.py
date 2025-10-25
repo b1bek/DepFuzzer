@@ -6,6 +6,7 @@ import argparse
 from pyfiglet import Figlet
 from utils.recover_dependencies import RecoverDependencies
 from utils.analyze_dependencies import AnalyzeDependencies
+from utils.misc import initialize_package_files, get_package_files_status
 
 def main():
     """
@@ -15,7 +16,7 @@ def main():
     print(f.renderText('DepFuzzer'))
     parser = argparse.ArgumentParser(prog='main.py', description='Dependency checker')
     parser.add_argument('--provider',
-                        choices=["npm","pypi","cargo","go","maven","gradle","rubygems","all"],
+                        choices=["npm","pypi","maven","rubygems","all"],
                         required=True,
                         type=str)
 
@@ -45,6 +46,21 @@ def main():
 
     args = parser.parse_args()
 
+    # Automatically ensure package files are available
+    ecosystems_to_init = []
+    if args.provider == "all":
+        ecosystems_to_init = ["npm", "pypi", "maven", "rubygems"]
+    else:
+        ecosystems_to_init = [args.provider]
+    
+    # Check and download package files if needed
+    status = get_package_files_status()
+    for ecosystem in ecosystems_to_init:
+        if ecosystem in status:
+            if not status[ecosystem].get('exists') or not status[ecosystem].get('fresh'):
+                print(f"[+] Package files for {ecosystem} are missing or stale, downloading...")
+                initialize_package_files([ecosystem])
+
     dependencies_to_check = {}
     if args.path is not None:
         if args.provider != "all":
@@ -62,7 +78,7 @@ def main():
         dependencies_to_check = {name: version}
 
     if args.provider == "all":
-        providers = ["npm","pypi","cargo","go","maven","gradle","rubygems"]
+        providers = ["npm","pypi","maven","rubygems"]  # cargo and go excluded for now
         for provider in providers:
             rd = RecoverDependencies(args.path, provider)
             rd.run()
