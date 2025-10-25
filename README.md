@@ -34,7 +34,7 @@ Moreover, this tool can be used to scan one specific dependency :
 
 `python3 main.py --provider pypi --dependency requests:0.1.0`
 
-Please note that the tool used a third-party called `deps.dev`, you might need to specify a proxy to reach it.
+The tool uses local package files for fast scanning and falls back to online APIs when needed.
 
 ## All possible arguments
 
@@ -48,7 +48,7 @@ ______          ______
           | |                               
           |_|                               
 
-usage: main.py [-h] --provider {npm,pypi,cargo,go,maven,gradle,all}
+usage: main.py [-h] --provider {npm,pypi,cargo,go,maven,gradle,rubygems,all}
                (--path PATH | --dependency DEPENDENCY) [--print-takeover PRINT_TAKEOVER]
                [--output-file OUTPUT_FILE] [--check-email CHECK_EMAIL]
 
@@ -56,7 +56,7 @@ Dependency checker
 
 options:
   -h, --help            show this help message and exit
-  --provider {npm,pypi,cargo,go,maven,gradle,all}
+  --provider {npm,pypi,cargo,go,maven,gradle,rubygems,all}
   --path PATH           Path to folder(s) to analyze
   --dependency DEPENDENCY
                         Specify the name of one dependency to check. If you specify the version,

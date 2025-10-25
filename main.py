@@ -16,7 +16,7 @@ def main():
     print(f.renderText('DepFuzzer'))
     parser = argparse.ArgumentParser(prog='main.py', description='Dependency checker')
     parser.add_argument('--provider',
-                        choices=["npm","pypi","maven","rubygems","all"],
+                        choices=["npm","pypi","cargo","go","maven","gradle","rubygems","all"],
                         required=True,
                         type=str)
 
@@ -49,7 +49,7 @@ def main():
     # Automatically ensure package files are available
     ecosystems_to_init = []
     if args.provider == "all":
-        ecosystems_to_init = ["npm", "pypi", "maven", "rubygems"]
+        ecosystems_to_init = ["npm", "pypi", "cargo", "go", "maven", "gradle", "rubygems"]
     else:
         ecosystems_to_init = [args.provider]
     
@@ -78,7 +78,7 @@ def main():
         dependencies_to_check = {name: version}
 
     if args.provider == "all":
-        providers = ["npm","pypi","maven","rubygems"]  # cargo and go excluded for now
+        providers = ["npm","pypi","cargo","go","maven","gradle","rubygems"]
         for provider in providers:
             rd = RecoverDependencies(args.path, provider)
             rd.run()

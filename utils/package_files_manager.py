@@ -4,6 +4,7 @@ Downloads and manages package lists from different ecosystems for faster depende
 """
 
 import json
+import re
 import requests
 import subprocess
 import time
@@ -47,6 +48,8 @@ class PackageFilesManager:
         
     def _get_file_path(self, ecosystem):
         """Get the file path for an ecosystem's package list"""
+        if ecosystem not in self.package_sources:
+            return None  # Ecosystem not supported for file-based checking
         return self.base_dir / self.package_sources[ecosystem]["file"]
     
     def _is_file_fresh(self, file_path, max_age_days=7):
@@ -129,7 +132,6 @@ class PackageFilesManager:
             if response.status_code == 200:
                 content = response.text
                 # Extract package names using exact regex from notebook
-                import re
                 public_mvn_packages = re.findall(r'<a href="([^"]*)"', content)
                 public_mvn_packages = [pkg.rstrip('/') for pkg in public_mvn_packages]
                 
@@ -215,8 +217,8 @@ class PackageFilesManager:
         """Check if a package exists in the downloaded package files"""
         file_path = self._get_file_path(ecosystem)
         
-        if not file_path.exists():
-            return None  # File doesn't exist, need to query API
+        if file_path is None or not file_path.exists():
+            return None  # Ecosystem not supported or file doesn't exist, need to query API
         
         try:
             if ecosystem == "npm":
